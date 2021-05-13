@@ -2,12 +2,15 @@ package com.company.app;
 
 import com.company.user.User;
 import com.company.user.UserService;
+import com.company.util.Validations;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.Optional;
 
 public class UserApp implements AppInterface {
-
+  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final UserService userService = new UserService();
 
   @Override
@@ -48,21 +51,27 @@ public class UserApp implements AppInterface {
       out.println("Список пользователей пуст.");
     } else {
       out.println("Список пользователей:");
-      users.get().forEach(out::println);
+      users.get().stream().map(gson::toJson).forEach(out::println);
     }
   }
 
   void printUserById() {
     try {
-      out.println("Введите id:");
-      int id = Integer.parseInt(in.nextLine());
+      int id = -1;
+      while (!Validations.isValidId(id)) {
+        out.println("Введите id:");
+        id = Integer.parseInt(in.nextLine());
+        if (!Validations.isValidId(id)) {
+          out.println("id должно быть не пустым и больше нуля");
+        }
+      }
       Optional<User> user = userService.findById(id);
 
       if (user.isEmpty()) {
         out.println("Пользователя с id " + id + " не существует");
       } else {
         out.println("Пользователь с id: " + id);
-        out.println(user.get());
+        out.println(gson.toJson(user.get()));
       }
       out.println();
     } catch (NumberFormatException err) {
@@ -72,12 +81,27 @@ public class UserApp implements AppInterface {
 
   void createUser() {
     try {
-      out.println("Введите возраст:");
-      int age = Integer.parseInt(in.nextLine());
-      out.println("Введите имя:");
-      String name = in.nextLine();
-      out.println("Введите пароль:");
-      String password = in.nextLine();
+
+      int age = -1;
+      while (!Validations.isValidAge(age)) {
+        out.println("Введите возраст:");
+        age = Integer.parseInt(in.nextLine());
+        out.println("Возраст должен быть не пустым и больше нуля");
+      }
+
+      String name = null;
+      while (!Validations.isValidName(name)) {
+        out.println("Введите имя:");
+        name = in.nextLine();
+        out.println("Имя должно быть не пустым");
+      }
+
+      String password = null;
+      while (!Validations.isValidPassword(password)) {
+        out.println("Введите пароль:");
+        password = in.nextLine();
+        out.println("Пароль должен быть не пустым и иметь не менее 5 символов");
+      }
 
       userService.createUser(name, age, password);
       out.println("Создан новый пользователь");
@@ -88,8 +112,14 @@ public class UserApp implements AppInterface {
 
   void editUser() {
     try {
-      out.println("Введите id:");
-      int id = Integer.parseInt(in.nextLine());
+      int id = -1;
+      while (!Validations.isValidId(id)) {
+        out.println("Введите id:");
+        id = Integer.parseInt(in.nextLine());
+        if (!Validations.isValidId(id)) {
+          out.println("id должно быть не пустым и больше нуля");
+        }
+      }
       Optional<User> result = userService.findById(id);
 
       if (result.isEmpty()) {
@@ -100,12 +130,26 @@ public class UserApp implements AppInterface {
 
       User user = result.get();
 
-      out.println("Введите возраст:");
-      int age = Integer.parseInt(in.nextLine());
-      out.println("Введите имя:");
-      String name = in.nextLine();
-      out.println("Введите пароль:");
-      String password = in.nextLine();
+      int age = -1;
+      while (!Validations.isValidAge(age)) {
+        out.println("Введите возраст:");
+        age = Integer.parseInt(in.nextLine());
+        out.println("Возраст должен быть не пустым и больше нуля");
+      }
+
+      String name = null;
+      while (!Validations.isValidName(name)) {
+        out.println("Введите имя:");
+        name = in.nextLine();
+        out.println("Имя должно быть не пустым");
+      }
+
+      String password = null;
+      while (!Validations.isValidPassword(password)) {
+        out.println("Введите пароль:");
+        password = in.nextLine();
+        out.println("Пароль должен быть не пустым и иметь не менее 5 символов");
+      }
 
       user.setAge(age);
       user.setName(name);
@@ -122,8 +166,14 @@ public class UserApp implements AppInterface {
 
   void deleteUser() {
     try {
-      out.println("Введите id:");
-      int id = Integer.parseInt(in.nextLine());
+      int id = -1;
+      while (!Validations.isValidId(id)) {
+        out.println("Введите id:");
+        id = Integer.parseInt(in.nextLine());
+        if (!Validations.isValidId(id)) {
+          out.println("id должно быть не пустым и больше нуля");
+        }
+      }
       Optional<User> user = userService.findById(id);
 
       if (user.isEmpty()) {

@@ -12,7 +12,6 @@ interface AppInterface {
 }
 
 public class App implements AppInterface {
-//  INSTANCE;
   public static final App INSTANCE = new App();
 
   private final AuthService authService = new AuthService();
@@ -34,8 +33,8 @@ public class App implements AppInterface {
     switch (page) {
       case 0 -> baseParseCommand();
       case 1 -> userApp.parseCommand();
-      case 2 -> gameApp.parseCommand();
-      case 3 -> softwareApp.parseCommand();
+      case 2 -> softwareApp.parseCommand();
+      case 3 -> gameApp.parseCommand();
       case 4 -> categoryApp.parseCommand();
     }
   }
@@ -71,9 +70,10 @@ public class App implements AppInterface {
 
   void parseAuthUser() {
     out.println("1 – перейти на страницу с пользователями");
-    out.println("2 – перейти на страницу с играми/программами");
-    out.println("3 – перейти на страницу с категориями");
-    out.println("4 – вывести список приобретенных игр/программ");
+    out.println("2 – перейти на страницу с программами");
+    out.println("3 – перейти на страницу с играми");
+    out.println("4 – перейти на страницу с категориями");
+    out.println("5 – вывести список приобретенных игр/программ");
     out.println("Введите команду: ");
 
     try {
@@ -81,7 +81,8 @@ public class App implements AppInterface {
       switch (commandNumber) {
         case 1 -> goToUserApp();
         case 2 -> goToSoftwareApp();
-        case 3 -> goToCategoryApp();
+        case 3 -> goToGameApp();
+        case 4 -> goToCategoryApp();
         case 0 -> System.exit(0);
         default -> out.println("Введите корректную команду");
       }
@@ -103,8 +104,12 @@ public class App implements AppInterface {
     page = 2;
   }
 
-  void goToCategoryApp() {
+  void goToGameApp() {
     page = 3;
+  }
+
+  void goToCategoryApp() {
+    page = 4;
   }
 
   void login() {

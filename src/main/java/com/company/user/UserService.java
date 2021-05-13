@@ -1,9 +1,5 @@
 package com.company.user;
 
-import com.company.util.HashUtil;
-
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 

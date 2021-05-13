@@ -12,11 +12,10 @@ public class Category {
   private int id;
   private String name;
 
-  @ManyToMany(targetEntity = Software.class)
+  @ManyToMany(targetEntity = Software.class, mappedBy = "")
   private List<Software> softwares;
 
-  public Category(int id, String name) {
-    this.id = id;
+  public Category(String name) {
     this.name = name;
   }
 
@@ -36,5 +35,17 @@ public class Category {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public List<Software> getSoftwares() {
+    return softwares;
+  }
+
+  public void setSoftwares(List<Software> softwares) {
+    this.softwares = softwares;
+  }
+
+  public void addSoftware(Software software) {
+    this.softwares.add(software);
   }
 }
