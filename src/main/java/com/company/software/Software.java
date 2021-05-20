@@ -1,24 +1,25 @@
 package com.company.software;
 
 import com.company.category.Category;
-import com.google.gson.annotations.Expose;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Software {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Expose
   private int id;
-  @Expose
   private String name;
-  @Expose
   private int price;
 
-  @ManyToMany(targetEntity = Category.class, mappedBy = "softwares")
+  @ManyToMany(targetEntity = Category.class)
   private List<Category> categories;
 
   public Software() {}

@@ -3,14 +3,13 @@ package com.company.app;
 import com.company.user.User;
 import com.company.user.UserService;
 import com.company.util.Validations;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public class UserApp implements AppInterface {
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final UserService userService = new UserService();
 
   @Override
@@ -31,6 +30,8 @@ public class UserApp implements AppInterface {
       out.println();
     } catch (NumberFormatException err) {
       out.println("Некорректный ввод");
+    } catch (Exception e) {
+      out.println("Ошибка: " + e);
     }
   }
 
@@ -51,7 +52,14 @@ public class UserApp implements AppInterface {
       out.println("Список пользователей пуст.");
     } else {
       out.println("Список пользователей:");
-      users.get().stream().map(gson::toJson).forEach(out::println);
+      try {
+        List<User> items = users.get();
+        for (User user: items) {
+          out.println(serializer.writeValueAsString(user));
+        }
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -70,8 +78,12 @@ public class UserApp implements AppInterface {
       if (user.isEmpty()) {
         out.println("Пользователя с id " + id + " не существует");
       } else {
-        out.println("Пользователь с id: " + id);
-        out.println(gson.toJson(user.get()));
+        try {
+          out.println("Пользователь с id: " + id);
+          out.println(serializer.writeValueAsString(user));
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
+        }
       }
       out.println();
     } catch (NumberFormatException err) {
@@ -134,7 +146,9 @@ public class UserApp implements AppInterface {
       while (!Validations.isValidAge(age)) {
         out.println("Введите возраст:");
         age = Integer.parseInt(in.nextLine());
-        out.println("Возраст должен быть не пустым и больше нуля");
+        if (!Validations.isValidAge(age)) {
+          out.println("Возраст должен быть не пустым и больше нуля");
+        }
       }
 
       String name = null;
@@ -148,7 +162,9 @@ public class UserApp implements AppInterface {
       while (!Validations.isValidPassword(password)) {
         out.println("Введите пароль:");
         password = in.nextLine();
-        out.println("Пароль должен быть не пустым и иметь не менее 5 символов");
+        if (!Validations.isValidPassword(password)) {
+          out.println("Пароль должен быть не пустым и иметь не менее 5 символов");
+        }
       }
 
       user.setAge(age);

@@ -3,6 +3,7 @@ package com.company.app;
 import com.company.game.Game;
 import com.company.game.GameService;
 import com.company.util.Validations;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,14 @@ public class GameApp implements AppInterface {
       out.println("Список игр пуст.");
     } else {
       out.println("Список игр:");
-      games.get().stream().map(gson::toJson).forEach(out::println);
+      try {
+        List<Game> items = games.get();
+        for (Game game: items) {
+          out.println(serializer.writeValueAsString(game));
+        }
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -68,7 +76,11 @@ public class GameApp implements AppInterface {
         out.println("Игра с id " + id + " не существует");
       } else {
         out.println("Игра с id: " + id);
-        out.println(gson.toJson(game.get()));
+        try {
+          out.println(serializer.writeValueAsString(game.get()));
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
+        }
       }
       out.println();
     } catch (NumberFormatException err) {

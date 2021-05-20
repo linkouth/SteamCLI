@@ -5,6 +5,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import com.company.address.Address;
 import com.company.util.HashUtil;
 
 @Entity
@@ -21,6 +22,9 @@ public class User {
   private String password;
 
   private String salt;
+
+  @ManyToOne(targetEntity = Address.class)
+  private Address address;
 
   public User() {}
 
@@ -69,4 +73,12 @@ public class User {
   }
 
   public void setSalt(String salt) { this.salt = salt; }
+
+  public Address getAddress() {
+    return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
+  }
 }

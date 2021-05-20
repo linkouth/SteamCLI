@@ -5,15 +5,15 @@ import com.company.category.CategoryService;
 import com.company.software.Software;
 import com.company.software.SoftwareService;
 import com.company.util.Validations;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class SoftwareApp implements AppInterface {
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final SoftwareService softwareService = new SoftwareService();
   private final CategoryService categoryService = new CategoryService();
 
@@ -48,13 +48,20 @@ public class SoftwareApp implements AppInterface {
   }
 
   void printAllSoftwares() {
-    Optional<List<Software>> users = softwareService.findAll();
+    Optional<List<Software>> softwares = softwareService.findAll();
 
-    if (users.isEmpty() || users.get().isEmpty()) {
+    if (softwares.isEmpty() || softwares.get().isEmpty()) {
       out.println("Список программ пуст.");
     } else {
       out.println("Список программ:");
-      users.get().forEach(out::println);
+      try {
+        List<Software> items = softwares.get();
+        for (Software software: items) {
+          out.println(serializer.writeValueAsString(software));
+        }
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -74,7 +81,11 @@ public class SoftwareApp implements AppInterface {
         out.println("Пользователя с id " + id + " не существует");
       } else {
         out.println("Пользователь с id: " + id);
-        out.println(user.get());
+        try {
+          out.println(serializer.writeValueAsString(user.get()));
+        }  catch (JsonProcessingException e) {
+          e.printStackTrace();
+        }
       }
       out.println();
     } catch (NumberFormatException err) {
@@ -88,32 +99,48 @@ public class SoftwareApp implements AppInterface {
       while (!Validations.isValidName(name)) {
         out.println("Введите имя:");
         name = in.nextLine();
-        out.println("Имя должно быть не пустым");
+        if (!Validations.isValidName(name)) {
+          out.println("Имя должно быть не пустым");
+        }
       }
 
       int price = -1;
       while (!Validations.isValidPrice(price)) {
         out.println("Введите цену:");
         price = Integer.parseInt(in.nextLine());
-        out.println("Цена должен больше нуля и не быть пустым");
-      }
-
-      int categoryId = -1;
-      Optional<Category> category = Optional.empty();
-      while (!Validations.isValidId(categoryId) && category.isEmpty()) {
-        out.println("Введите id категории:");
-        categoryId = Integer.parseInt(in.nextLine());
-        category = categoryService.findById(categoryId);
-        if (category.isEmpty()) {
-          out.println("Id должно быть больше нуля и существовать");
+        if (!Validations.isValidPrice(price)) {
+          out.println("Цена должен больше нуля и не быть пустым");
         }
       }
 
-      ArrayList<Category> categories = new ArrayList<>();
+      int categoryId = -1;
+      List<Category> categories = new ArrayList<>();
+      boolean isValidIds = false;
+      while (!isValidIds) {
+        out.println("Введите id категории через пробел:");
+        List<Integer> categoryIds = Arrays
+                .stream(in.nextLine().split(" "))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        List<Optional<Category>> items = categoryIds.stream()
+                .map(categoryService::findById)
+                .collect(Collectors.toList());
+        if (!items.stream().allMatch(Optional::isPresent)) {
+          out.println("Id должны существовать");
+        } else {
+          isValidIds = true;
+          categories = items.stream().map(Optional::get).collect(Collectors.toList());
+        }
+      }
+
       Software software = new Software(name, price, categories);
-      if (category.isPresent()) {
-        categories.add(category.get());
-        category.get().addSoftware(software);
+      if (!categories.isEmpty()) {
+        List<Category> categoriesFromDB = new ArrayList<>(categories);
+        for (int i = 0; i < categoriesFromDB.size(); ++i) {
+          Category category = categoriesFromDB.get(i);
+          category.addSoftware(software);
+          software.addCategory(category);
+        }
       }
       softwareService.createSoftware(software);
       out.println("Добавлена новая программа");

@@ -6,11 +6,8 @@ import com.company.software.Software;
 import javax.persistence.*;
 import java.util.List;
 
-import com.google.gson.annotations.Expose;
-
 @Entity
 public class Game extends Software {
-  @Expose
   private Boolean hasMutliplayer;
 
   public Game() {}

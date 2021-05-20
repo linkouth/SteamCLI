@@ -1,6 +1,9 @@
 package com.company.app;
 
 import com.company.user.AuthService;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -9,6 +12,10 @@ interface AppInterface {
   void parseCommand();
   Scanner in = new Scanner(System.in);
   PrintStream out = System.out;
+
+  final ObjectWriter serializer = new ObjectMapper()
+          .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+          .writerWithDefaultPrettyPrinter();
 }
 
 public class App implements AppInterface {
@@ -20,6 +27,7 @@ public class App implements AppInterface {
   private final SoftwareApp softwareApp = new SoftwareApp();
   private final GameApp gameApp = new GameApp();
   private final CategoryApp categoryApp = new CategoryApp();
+  private final AddressApp addressApp = new AddressApp();
 
   private int page = 0;
 
@@ -36,6 +44,7 @@ public class App implements AppInterface {
       case 2 -> softwareApp.parseCommand();
       case 3 -> gameApp.parseCommand();
       case 4 -> categoryApp.parseCommand();
+      case 5 -> addressApp.parseCommand();
     }
   }
 
@@ -73,7 +82,7 @@ public class App implements AppInterface {
     out.println("2 – перейти на страницу с программами");
     out.println("3 – перейти на страницу с играми");
     out.println("4 – перейти на страницу с категориями");
-    out.println("5 – вывести список приобретенных игр/программ");
+    out.println("5 – перейти на страницу с адресами");
     out.println("Введите команду: ");
 
     try {
@@ -83,6 +92,7 @@ public class App implements AppInterface {
         case 2 -> goToSoftwareApp();
         case 3 -> goToGameApp();
         case 4 -> goToCategoryApp();
+        case 5 -> goToAddressApp();
         case 0 -> System.exit(0);
         default -> out.println("Введите корректную команду");
       }
@@ -110,6 +120,10 @@ public class App implements AppInterface {
 
   void goToCategoryApp() {
     page = 4;
+  }
+
+  void goToAddressApp() {
+    page = 5;
   }
 
   void login() {

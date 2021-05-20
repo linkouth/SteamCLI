@@ -3,14 +3,12 @@ package com.company.app;
 import com.company.category.Category;
 import com.company.category.CategoryService;
 import com.company.util.Validations;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.List;
 import java.util.Optional;
 
 public class CategoryApp implements AppInterface {
-  private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final CategoryService categoryService = new CategoryService();
 
   public void parseCommand() {
@@ -50,7 +48,14 @@ public class CategoryApp implements AppInterface {
       out.println("Список категорий пуст.");
     } else {
       out.println("Список категорий:");
-      categories.get().stream().map(gson::toJson).forEach(out::println);
+      try {
+        List<Category> items = categories.get();
+        for (Category category: items) {
+          out.println(serializer.writeValueAsString(category));
+        }
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -70,7 +75,11 @@ public class CategoryApp implements AppInterface {
         out.println("Категория с id " + id + " не существует");
       } else {
         out.println("Категория с id: " + id);
-        out.println(gson.toJson(category.get()));
+        try {
+          out.println(serializer.writeValueAsString(category.get()));
+        } catch (JsonProcessingException e) {
+          e.printStackTrace();
+        }
       }
       out.println();
     } catch (NumberFormatException err) {
@@ -84,7 +93,9 @@ public class CategoryApp implements AppInterface {
       while (!Validations.isValidName(name)) {
         out.println("Введите название:");
         name = in.nextLine();
-        out.println("Название должно быть не пустым");
+        if (!Validations.isValidName(name)) {
+          out.println("Название должно быть не пустым");
+        }
       }
 
       categoryService.createCategory(name);
@@ -118,7 +129,9 @@ public class CategoryApp implements AppInterface {
       while (!Validations.isValidName(name)) {
         out.println("Введите название категории:");
         name = in.nextLine();
-        out.println("Название должно быть не пустым");
+        if (!Validations.isValidName(name)) {
+          out.println("Название должно быть не пустым");
+        }
       }
 
       category.setName(name);

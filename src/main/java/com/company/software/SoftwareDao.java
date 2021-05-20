@@ -11,10 +11,10 @@ public class SoftwareDao {
     return HibernateSessionFactoryUtil.getSessionFactory().openSession().get(Software.class, id);
   }
 
-  void save(Software Software) {
+  void save(Software software) {
     Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
     Transaction tx1 = session.beginTransaction();
-    session.save(Software);
+    session.save(software);
     tx1.commit();
     session.close();
   }
